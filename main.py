@@ -23,14 +23,14 @@ class ClueCell:
 
     def isViolated(self):
         if self.eastSum != 0:
-            if self.duplicateEast():
-                return True
+            # if self.duplicateEast():
+            #     return True
             if self.checkEastSum():
                 return True
 
         if self.southSum != 0:
-            if self.duplicateSouth():
-                return True
+            # if self.duplicateSouth():
+            #     return True
             if self.checkSouthSum():
                 return True
 
@@ -53,16 +53,36 @@ class ClueCell:
 
         allAssigned = True
 
-        temp = 0
+        temp1 = 0
+        unAssigned = 0
         for cell in self.easternValueCells:
-            if temp <= self.eastSum:
+            if temp1 <= self.eastSum:
                 if cell.value == 0:
+                    unAssigned += 1
                     allAssigned = False
-                temp += cell.value
+                temp1 += cell.value
             else:
                 return True
 
-        if allAssigned and temp < self.eastSum:
+
+        if (unAssigned*(unAssigned+1))/2 + temp1 < self.eastSum:
+            return True
+
+        if (45 - ((unAssigned-1)*unAssigned)/2) + temp1 > self.eastSum:
+            return True
+        # temp2 = temp1
+        # for i in range(unAssigned):
+        #     temp2 += i + 1
+        # if temp2 > self.eastSum:
+        #     return True
+        #
+        # temp2 = temp1
+        # for i in range(unAssigned):
+        #     temp2 += 9 - i
+        # if temp2 < self.eastSum:
+        #     return True
+
+        if allAssigned and temp1 < self.eastSum:
             return True
         else:
             return False
@@ -84,16 +104,36 @@ class ClueCell:
 
         allAssigned = True
 
-        temp = 0
+        unAssigned = 0
+        temp1 = 0
         for cell in self.southernValueCells:
-            if temp <= self.southSum:
+            if temp1 <= self.southSum:
                 if cell.value == 0:
+                    unAssigned += 1
                     allAssigned = False
-                temp += cell.value
+                temp1 += cell.value
             else:
                 return True
 
-        if allAssigned and temp < self.southSum:
+        if unAssigned*(unAssigned+1)/2 + temp1 > self.southSum:
+            return True
+
+        if (45 - (unAssigned-1)*unAssigned/2) + temp1 < self.southSum:
+            return True
+
+        # temp2 = temp1
+        # for i in range(unAssigned):
+        #     temp2 += i + 1
+        # if temp2 > self.southSum:
+        #     return True
+        #
+        # temp2 = temp1
+        # for i in range(unAssigned):
+        #     temp2 += 9 - i
+        # if temp2 < self.southSum:
+        #     return True
+
+        if allAssigned and temp1 < self.southSum:
             return True
         else:
             return False
@@ -253,12 +293,12 @@ class Kakuro:
     def orderValues(self, domain):
         # ########### Random ###########################
 
-        temp = domain
-        result = list()
-        while len(temp) != 0:
-            index = random.randint(0, len(temp) - 1)
-            result.append(temp.pop(index))
-        return result
+        # temp = domain
+        # result = list()
+        # while len(temp) != 0:
+        #     index = random.randint(0, len(temp) - 1)
+        #     result.append(temp.pop(index))
+        # return result
 
 
         # ########### Median ###########################
@@ -278,8 +318,8 @@ class Kakuro:
 
         # ########## smallest ##########################
 
-        # temp = sorted(domain)
-        # return temp
+        temp = sorted(domain)
+        return temp
 
     def isWin(self):
 
@@ -325,7 +365,7 @@ def recursiveBackTracking(csp: Kakuro):
     temp = csp.orderValues(list(set(variable.northClue.southDomain).intersection(set(variable.westClue.eastDomain))))
     for value in temp:
         if variable.assign(value):
-            if csp.isConsistent():
+            if csp.isConsistentEnhanced(variable):
                 result = recursiveBackTracking(csp)
                 if result:
                     return True
@@ -397,10 +437,10 @@ example_4 = {(0, 0, 0, 0), (0, 1, 0, 0), (0, 2, 34, 0), (0, 3, 12, 0), (0, 4, 0,
 
 
 def my_func():
-    kakuro = Kakuro(5, 5, example_3)
+    kakuro = Kakuro(13, 13, example_2)
     backTrackingSearch(kakuro)
 
-my_time = timeit.timeit("my_func()", "from __main__ import my_func", number=100)
+my_time = timeit.timeit("my_func()", "from __main__ import my_func", number=10)
 print("\n\n\n\n\n\n\n\n\n\n\n\n"
       "\n###########################################################################################################\n")
 print("RecursiveBacktracking\n"
@@ -408,7 +448,7 @@ print("RecursiveBacktracking\n"
       "Variable Choosing Order: Enhanced\n"
       "Value Choosing Order: Random\n"
       "Number of Executions: 100\n"
-      f"Average time: {my_time / 100}")
+      f"Average time: {my_time / 10}")
 
 
 # print_kakuro(kakuro)
